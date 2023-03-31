@@ -1,0 +1,37 @@
+version: "3.9"
+services:
+  app:
+    restart: always
+    build:
+      dockerfile: ./docker/Dockerfile
+      context: .
+    depends_on:
+      db:
+        condition: service_healthy
+
+    ports:
+      - "8080:8080"
+    environment:
+      DB_USER: user
+      DB_NAME: bookstore
+      DB_PASSWORD: 123456789
+      DB_HOST: db
+      DB_PORT: 3306
+      LANG: C.UTF_8
+
+  db:
+    image: mysql:8.0
+    command: [ 'mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
+    volumes:
+      - ./docker/createtable.sql:/docker-entrypoint-initdb.d/01-createtable.sql:ro
+      - ./docker/demodata.sql:/docker-entrypoint-initdb.d/02-demodata.sql:ro
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: bookstore
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 123456789
+      LANG: C.UTF_8
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10

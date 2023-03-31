@@ -1,0 +1,26 @@
+syntax = "proto3";
+package api;
+
+service Bookstore {
+  rpc FindBooksByAuthor(Author) returns (FindBooksResponse) {};
+  rpc FindAuthorsByBook(Book) returns (FindAuthorsResponse) {};
+}
+
+message Book {
+  int64 id = 1;
+  string name = 2;
+}
+
+message Author {
+  int64 id = 1;
+  string firstname = 2;
+  string lastname = 3;
+}
+
+message FindBooksResponse {
+  repeated Book books = 1;
+}
+
+message FindAuthorsResponse {
+  repeated Author authors = 1;
+}
